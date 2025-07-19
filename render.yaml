@@ -7,11 +7,6 @@ services:
     plan: free
     # Le dice a Render que construya desde el Dockerfile en el repo
     dockerfilePath: ./Dockerfile
-    # Configuración del disco para guardar archivos temporales
-    disk:
-      name: opendevin-data
-      mountPath: /app/opendevin/workdir
-      sizeGB: 1
     # Variables de entorno para configurar el agente
     envVars:
       # Le decimos a OpenDevin que escuche en todas las interfaces, necesario para Render
@@ -28,13 +23,19 @@ services:
         value: https://generativelanguage.googleapis.com/v1beta
       # Acá vamos a poner nuestra API Key de forma segura
       - key: LLM_API_KEY
-        # Le decimos a Render que use un "secret" que vamos a crear después
+        # Le decimos a Render que esta variable viene de un "Secret"
         fromSecret: true
-        # El nombre del secret que crearemos
-        secretKey: GEMINI_API_KEY
       # Directorio de trabajo del agente
       - key: WORKSPACE_BASE
         value: /app/opendevin/workdir
       # Desactivamos el modo sandbox por simplicidad en Render
       - key: SANDBOX_TYPE
         value: exec
+
+# Esta sección es para definir el Secret que vamos a usar
+# Es la forma correcta de decirle a Render de dónde sacar la clave
+secrets:
+  - key: LLM_API_KEY
+    # El nombre que le vamos a dar al grupo de secrets en la UI de Render
+    # Esto es opcional pero ayuda a organizar
+    group: GeminiCredentials
